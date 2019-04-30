@@ -1,6 +1,7 @@
 package readline
 
 import (
+	"github.com/mattn/go-runewidth"
 	"reflect"
 	"testing"
 )
@@ -18,7 +19,7 @@ func TestRuneWidth(t *testing.T) {
 		{runes.ColorFilter([]rune("☭\033[13;1m你")), 3},
 	}
 	for _, r := range rs {
-		if w := runes.WidthAll(r.r); w != r.length {
+		if w := runewidth.StringWidth(string(r.r)); w != r.length {
 			t.Fatal("result not expect", r.r, r.length, w)
 		}
 	}

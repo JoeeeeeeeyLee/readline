@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chzyer/readline"
+	"github.com/mritd/readline"
 )
 
 func usage(w io.Writer) {
@@ -72,12 +72,13 @@ func filterInput(r rune) (rune, bool) {
 
 func main() {
 	l, err := readline.NewEx(&readline.Config{
-		Prompt:          "\033[31m»\033[0m ",
+		Prompt:          "\033[32m»\033[0m ",
 		HistoryFile:     "/tmp/readline.tmp",
 		AutoComplete:    completer,
 		InterruptPrompt: "^C",
 		EOFPrompt:       "exit",
 
+		DisableBell:         true,
 		HistorySearchFold:   true,
 		FuncFilterInputRune: filterInput,
 	})
@@ -85,6 +86,19 @@ func main() {
 		panic(err)
 	}
 	defer l.Close()
+
+	l.Config.SetListener(func(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
+		if len(line) > 5 {
+			l.SetPrompt("\033[31m»\033[0m ")
+			l.Refresh()
+			return nil, 0, false
+		} else {
+			l.SetPrompt("\033[32m»\033[0m ")
+			l.Refresh()
+			return nil, 0, false
+		}
+
+	})
 
 	setPasswordCfg := l.GenPasswordConfig()
 	setPasswordCfg.SetListener(func(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {

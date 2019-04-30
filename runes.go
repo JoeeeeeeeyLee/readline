@@ -2,6 +2,7 @@ package readline
 
 import (
 	"bytes"
+	"github.com/mattn/go-runewidth"
 	"unicode"
 	"unicode/utf8"
 )
@@ -29,16 +30,16 @@ func (Runes) EqualRune(a, b rune, fold bool) bool {
 	return false
 }
 
-func (r Runes) EqualRuneFold(a, b rune) bool {
-	return r.EqualRune(a, b, true)
+func (rs Runes) EqualRuneFold(a, b rune) bool {
+	return rs.EqualRune(a, b, true)
 }
 
-func (r Runes) EqualFold(a, b []rune) bool {
+func (rs Runes) EqualFold(a, b []rune) bool {
 	if len(a) != len(b) {
 		return false
 	}
 	for i := 0; i < len(a); i++ {
-		if r.EqualRuneFold(a[i], b[i]) {
+		if rs.EqualRuneFold(a[i], b[i]) {
 			continue
 		}
 		return false
@@ -129,42 +130,43 @@ func (Runes) ColorFilter(r []rune) []rune {
 	return newr
 }
 
-var zeroWidth = []*unicode.RangeTable{
-	unicode.Mn,
-	unicode.Me,
-	unicode.Cc,
-	unicode.Cf,
-}
-
-var doubleWidth = []*unicode.RangeTable{
-	unicode.Han,
-	unicode.Hangul,
-	unicode.Hiragana,
-	unicode.Katakana,
-}
+//var zeroWidth = []*unicode.RangeTable{
+//	unicode.Mn,
+//	unicode.Me,
+//	unicode.Cc,
+//	unicode.Cf,
+//}
+//
+//var doubleWidth = []*unicode.RangeTable{
+//	unicode.Han,
+//	unicode.Hangul,
+//	unicode.Hiragana,
+//	unicode.Katakana,
+//}
 
 func (Runes) Width(r rune) int {
 	if r == '\t' {
 		return TabWidth
 	}
-	if unicode.IsOneOf(zeroWidth, r) {
-		return 0
-	}
-	if unicode.IsOneOf(doubleWidth, r) {
-		return 2
-	}
-	return 1
+	//if unicode.IsOneOf(zeroWidth, r) {
+	//	return 0
+	//}
+	//if unicode.IsOneOf(doubleWidth, r) {
+	//	return 2
+	//}
+	//return 1
+	return runewidth.RuneWidth(r)
 }
 
 func (Runes) WidthAll(r []rune) (length int) {
 	for i := 0; i < len(r); i++ {
-		length += runes.Width(r[i])
+		length += runewidth.RuneWidth(r[i])
 	}
 	return
 }
 
 func (Runes) Backspace(r []rune) []byte {
-	return bytes.Repeat([]byte{'\b'}, runes.WidthAll(r))
+	return bytes.Repeat([]byte{'\b'}, runewidth.StringWidth(string(r)))
 }
 
 func (Runes) Copy(r []rune) []rune {
