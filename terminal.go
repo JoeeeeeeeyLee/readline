@@ -116,7 +116,6 @@ func (t *Terminal) KickRead() {
 }
 
 func (t *Terminal) ioloop() {
-	//t.wg.Add(1)
 	defer func() {
 		t.wg.Done()
 		close(t.outchan)
